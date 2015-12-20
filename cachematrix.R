@@ -1,15 +1,39 @@
-## Put comments here that give an overall description of what your
-## functions do
-
-## Write a short comment describing this function
-
+## use makeCacheMatrix to optimize large matrices where the inverse is
+## needed more than once during processing. After wrapping your large matrix
+## with makeCacheMatrix, call cacheSolve for the inverse. Repeat cacheSolve 
+## as needed and marvel at the speed.
+## 
+## Sample usage:
+## 
+##   cacheable <- makeCacheMatrix(myLargeMatrix)
+##   inverse   <- cacheSolve(cacheable)
+## 
 makeCacheMatrix <- function(x = matrix()) {
-
+  inverse <- NULL
+  set <- function(y) {
+    x <<- y
+    inverse <<- NULL
+  }
+  get <- function() x
+  setinverse <- function(i) inverse <<- i
+  getinverse <- function() inverse
+  list(set = set, get = get,
+       setinverse = setinverse,
+       getinverse = getinverse)  
 }
 
 
-## Write a short comment describing this function
-
+## Given a variable returned from makeCacheMatrix, cacheSolve returns the 
+## inverse. Subsequent calls are cached.
+## See ?solve for more details on calculating the inverse
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+  inverse <- x$getinverse()
+  if(!is.null(inverse)) {
+    message("getting cached data")
+    return(inverse)
+  }
+  data <- x$get()
+  inverse <- solve(data, ...)
+  x$setinverse(inverse)
+  inverse  
 }
